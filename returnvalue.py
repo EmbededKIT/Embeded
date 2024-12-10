@@ -1,6 +1,6 @@
 import cv2
 
-def detect_faces_and_get_angle(image_path):
+def detect_faces_and_save_angles(image_path, output_file="angles.txt"):
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
     image = cv2.imread(image_path)
@@ -16,20 +16,27 @@ def detect_faces_and_get_angle(image_path):
         return None
 
     img_height, img_width = gray.shape
+    angles = []  
 
-    for (x, w) in faces:
-        face_center_x = x + w // 2  
-
+    for (x, y, w, h) in faces:
+        face_center_x = x + w // 2
         angle_x = int((face_center_x / img_width) * 180)
+        angles.append(angle_x)  
 
         print(f"Face detected at ({face_center_x}).")
-        print(f"Mapped angle: X={angle_x} degrees")#test mapped angle
-        return angle_x
+        print(f"Mapped angle: X={angle_x} degrees")
 
-    return None
+    # 각도를 파일에 저장
+    with open(output_file, "w") as file:
+        file.write(",".join(map(str, angles)))
+
+    print(f"Angles saved to {output_file}.")
+    return angles
 
 # 테스트 실행
 if __name__ == "__main__":
+    subprocess.run("libcamera-still -o test.jpg")
     image_path = "test.jpg"
+    anglelist=[0,0,0,0,0,0]
     angle = detect_faces_and_get_angle(image_path)
 
