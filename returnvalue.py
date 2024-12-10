@@ -1,8 +1,8 @@
 import cv2
-
-def detect_faces_and_save_angles(image_path, output_file="angles.txt"):
+import subprocess
+def detect_faces_and_get_angle(image_path):
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-
+    output_file="angles.txt"
     image = cv2.imread(image_path)
     if image is None:
         print("Error: Could not load image.")
@@ -35,7 +35,7 @@ def detect_faces_and_save_angles(image_path, output_file="angles.txt"):
 
 # 테스트 실행
 if __name__ == "__main__":
-    subprocess.run("libcamera-still -o test.jpg")
+    subprocess.run("libcamera-still -o test.jpg", shell=True,check=True)
     image_path = "test.jpg"
     anglelist=[0,0,0,0,0,0]
     angle = detect_faces_and_get_angle(image_path)
