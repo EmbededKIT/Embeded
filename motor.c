@@ -1,102 +1,51 @@
-#include <wiringPi.h>
-#include <pthread.h>
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <wiringPi.h>
+#include <wiringSerial.h>
 
-#define SERVO_PIN 12     // 서보모터 핀
-#define SERVO_RANGE 2000 // 서보 모터 PWM 범위
+#define BAUD_RATE 115200
+static const char* UART1_DEV = "/dev/ttyAMA1"; // RPi5: UART1 장치 파일
+int people_number = 0; // 전역 변수
 
-#define DC_START 18   // DC 모터 핀
-#define DC_END 19     // DC 모터 핀
-#define DC_SPEED 100  // DC 모터 속도 (0 ~ 100)
-#define DC_RANGE 1023 // DC 모터 PWM 범위
+unsigned char serialRead(const int fd); // 1Byte 데이터를 수신하는 함수
 
-// 전역 변수 및 뮤텍스
-pthread_mutex_t motor;
-
-// 서보 모터 각도 이동
-void rotate_servo(float angle)
-{
-    int duty = 150 + (angle * 100 / 90);
-
-    pthread_mutex_lock(&motor);
-
-    pwmWrite(SERVO_PIN, duty);
-    delay(500); // 0.5초 대기
-
-    pthread_mutex_unlock(&motor);
-
-    printf("%.2f도 위치로 이동\n", angle);
+// 1Byte 데이터를 수신하는 함수
+unsigned char serialRead(const int fd) {
+    unsigned char x;
+    if (read(fd, &x, 1) != 1) // 1바이트 읽기 실패 시 -1 반환
+        return -1;
+    return x;
 }
 
-// DC 모터 카드 분배
-void rotate_dc(int speed)
-{
-    pthread_mutex_lock(&motor);
+int main() {
+    int fd_serial;
+    unsigned char dat;
 
-    for (int i = 0; i < 3; i++) // 카드 수만큼 반복
-    {
-        pwmWrite(DC_START, speed); // 카드 분배
-        delay(700);
-        pwmWrite(DC_START, 0);
-
-        delay(500);
-
-        pwmWrite(DC_END, speed); // 카드 밀어넣기
-        delay(500);
-        pwmWrite(DC_END, 0);
-        pwmWrite(DC_START, 0);
-    }
-
-    pthread_mutex_unlock(&motor);
-
-    printf("카드 분배 완료\n\n");
-}
-
-// 사용자 좌표
-void *get_location(void *args)
-{
-    float *user = (float *)args; // 사용자 좌표 배열
-    int user_count = (int)user[0];
-
-    for (int i = 1; i <= user_count; i++)
-    {
-        printf("사용자 %d의 좌표: %.2f도\n", i, user[i]);
-        rotate_servo(user[i]);                  // 서보 모터 각도 이동
-        rotate_dc(DC_SPEED * (DC_RANGE / 100)); // DC 모터 카드 분배
-    }
-}
-
-int main()
-{
-    if (wiringPiSetupGpio() == -1)
-    {
-        printf("GPIO 초기화 실패\n");
+    // WiringPi 초기화
+    if (wiringPiSetupGpio() < 0) {
+        printf("WiringPi 초기화 실패\n");
         return 1;
     }
 
-    // 서보 모터 및 DC 모터 핀 설정
-    pinMode(SERVO_PIN, PWM_OUTPUT);
-    pinMode(DC_START, PWM_OUTPUT);
-    pinMode(DC_END, PWM_OUTPUT);
+    // UART1 포트 열기
+    if ((fd_serial = serialOpen(UART1_DEV, BAUD_RATE)) < 0) {
+        printf("UART 포트를 열 수 없습니다: %s\n", UART1_DEV);
+        return 1;
+    }
 
-    pwmSetMode(PWM_MODE_MS);
-    pwmSetRange(SERVO_RANGE);
-    pwmSetClock(19200000 / (50 * SERVO_RANGE));
-
-    // 사용자 좌표 테스트
-    // [0]: 사용자 수, [n]: 사용자 n 좌표
-    float user[] = {4, 30.0, -45.0, 60.0, 90.0};
-
-    pthread_t user_thread;
-
-    pthread_mutex_init(&motor, NULL);                               // 뮤텍스 초기화
-    pthread_create(&user_thread, NULL, get_location, (void *)user); // 쓰레드 생성
-    pthread_join(user_thread, NULL);                                // 쓰레드 종료 대기
-    pthread_mutex_destroy(&motor);                                  // 뮤텍스 제거
-
-    printf("카드 분배 종료\n");
-
-    return 0;
-} 
+    while (1) {
+        if (serialDataAvail(fd_serial)) { // 읽을 데이터가 있는 경우
+            dat = serialRead(fd_serial);  // 1바이트 데이터를 읽음
+            
+            // 읽은 데이터가 2~6인 경우만 처리
+            if (dat >= '1' && dat <= '5') {
+                people_number = dat - '0'; // 아스키 값을 정수로 변환
+                printf("People number: %d\n", people_number);
+            } else {
+                printf("무시된 데이터: %c\n", dat);0
+            }
+        }
+        delay(10); // 짧은 대기 (10ms)
+    }
+}
