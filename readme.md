@@ -78,4 +78,6 @@ while (!servo_reached)
 servo_reached = 0;
 pthread_mutex_unlock(&mutex);
 ```
+### Demo영상
+![image](https://github.com/user-attachments/assets/9269e44c-bf87-46bb-bcef-e6a763f2947d)
 
