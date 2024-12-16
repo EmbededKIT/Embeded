@@ -1,26 +1,24 @@
-#에 자신이 맡은 파트 그림 및 내용 보충
-
-Embeded KIT Project(8조)
-
+#Embeded KIT Project(8조)
+**#에 자신이 맡은 파트 그림 및 내용 보충**
 카드 분배기
 
-초기설계(11/28)
+# 초기설계(11/28~) 개발시작
 4개의 센서 
-# Bluetooth 
+## Bluetooth 
 - 앱을 활용하여 사용자 Input값 받고 전송
 - 사용자 수와 카드 수 전달 
 - APP UI
-# Camera
+## Camera
 - opencv를 활용하여 사용자의 얼굴 인식. 
 - 해당좌표를 라즈베리파이로 전송 및 비율을 나누어서 서보로 값 전달
-# Survo Motor
+## Survo Motor
 - 카메라에서 전달받은 값을 통해 0~180도로 사용자의 위치로 전송 이후 DC모터
 - 한장씩 뿌리고 원위치 반복.
-
-# DC Motor
+## DC Motor
 - 기기 하단에서 슬라이딩방식으로 카드 던져주기
+- 서보모터로부터 신호를 받아 카드 1장 발사
 
-* 3D프린터를 활용하여 모델 설계(과정 기입)
+#3D프린터를 활용하여 모델 설계(과정 기입)
 
 #설계도
 #1. 서보모터를 위한 바텀(기입)
@@ -32,12 +30,13 @@ Embeded KIT Project(8조)
 
 1. 기존 구상대로의 1mm 파이프라인불가능.  
 -> 시중에 쉽게 구할 수 있는 5mm파이프라인으로 대체. 안정성은 올라갔으나 정교함이 떨어짐.
-
+#사진첨부(본래 1mm로 구현하려고 하였던 사진 첨부)
 2. 스택방식으로 쌓이는 덱, 바텀쪽이 우선순위로 슬라이딩 되는 구조가 불가능
+#사진첨부()
 -> 바텀에서 꺼내려고 시도해봤으나 DC모터의 세기가 약해 쌓여있는 카드의 무게를 감당하지 못함. 
--> 또한 카드 한장의 두꼐만 나올 수 있게끔 설계가 불가능하므로, 탑에서 카드 슬라이딩으로 변경 
+-> 또한 카드 한장의 두께만 나올 수 있게끔 설계가 불가능하므로, 탑에서 카드 슬라이딩으로 변경 
+#사진첨부()
 
-#최종 설계도(덱) 
 
 ## 문제점
 1) 정확히 한장을 뿌릴 수 있는가?
@@ -45,8 +44,39 @@ Embeded KIT Project(8조)
 2) 카드가 겹쳐있다면 어떻게 대처할 것인가?
 -> 대응 불가능...
 
-
 ## 변경점
 1. 초기엔 앱에서 인원수와 카드수를 Input값으로 받음. 
 Dectection을 통해 인원수값을 받아오고, 엡에서는 카드수만 받기로 변경(12/12)
-   
+#앱 사진 과정 및 로직 기입
+
+2. DC모터가 균형이 맞지 않아 헛돌거나 뒤로 돔.
+-> 뒤쪽에 추를 달아서 해결
+#사진첨부
+
+# 최종(12/15)
+#최종 설계도(덱) 
+#설계도 첨부
+## 구조도
+![image](https://github.com/user-attachments/assets/637a5f62-8723-4eec-86e0-024c01724285)
+## mutex를 어떻게 설계하였는가?
+- 이 카드분배기에서 딜러의 움직임을 따라하기 위해, DC모터와 서보모터의 동작을 동기화
+- 즉 서보모터가 회전하면서 DC모터의 회전을 동시에 하기 위해 쓰레드 활용
+![image](https://github.com/user-attachments/assets/cf2e5445-803d-4f56-8d32-33d6b5e60730)
+### ServoMotor
+```c++
+pthread_mutex_lock(&mutex);
+servo_reached = i + 1;
+pthread_cond_signal(&servo_at_position);
+pthread_mutex_unlock(&mutex);
+```
+### DCMotor
+```c++
+ pthread_mutex_lock(&mutex);
+while (!servo_reached)
+{
+      pthread_cond_wait(&servo_at_position, &mutex);
+}
+servo_reached = 0;
+pthread_mutex_unlock(&mutex);
+```
+
