@@ -81,3 +81,7 @@ pthread_mutex_unlock(&mutex);
 ### Demo영상
 ![image](https://github.com/user-attachments/assets/9269e44c-bf87-46bb-bcef-e6a763f2947d)
 
+![1734445958737-1](https://github.com/user-attachments/assets/21f7a83d-1df3-4bcb-be1f-78ac0e5fe784)
+
+
+
