@@ -8,7 +8,7 @@
 - 사용자 수와 카드 수 전달 
 - APP UI
 ## Camera
-- opencv를 활용하여 사용자의 얼굴 인식. 
+- opencv를 활용하여 사용자의 얼굴 인식. (opencv HaarCascade_Frontface 사용)
 - 해당좌표를 라즈베리파이로 전송 및 비율을 나누어서 서보로 값 전달
 ## Survo Motor
 - 카메라에서 전달받은 값을 통해 0~180도로 사용자의 위치로 전송 이후 DC모터
@@ -40,8 +40,6 @@
 실제 구현시 다양한 문제 발생
 3D프린터는 1mm단위의 정교한 설계가 불가능. 이로 인해 다양한 문제점 발생
 
-
-
 # App
  * UART 통신 이용
  * 참고: 강의자료 5-3 UART 통신 예제 코드 2
@@ -65,7 +63,6 @@
    1. 안드로이드 권한 요청(근처 기기)
    2. 페어링 된 블루투스 모듈과 연결
    3. 연결된 모듈로 값 전달 
- 
 
 ## 문제점
 1) 정확히 한장을 뿌릴 수 있는가?
@@ -80,13 +77,18 @@ Dectection을 통해 인원수값을 받아오고, 엡에서는 카드수만 받
 
 2. DC모터가 균형이 맞지 않아 헛돌거나 뒤로 돔.
 -> 뒤쪽에 추를 달아서 해결
-#사진첨부
+![image](https://github.com/user-attachments/assets/b4f688cd-49fb-4d13-8e61-c7aaad2273ad)
+약 1g짜리 클립들을 이용해 무게 조절에 성공
 
 # 최종(12/15)
-#최종 설계도(덱) 
-#설계도 첨부
+1. 완성본
+![image](https://github.com/user-attachments/assets/10a6c95a-74f5-4bf8-860c-992cab3a0379)
+2. 카메라
+![image](https://github.com/user-attachments/assets/3f4b5313-11b8-4072-b476-f0c5ec201fc4)
+
 ## 구조도
 ![image](https://github.com/user-attachments/assets/637a5f62-8723-4eec-86e0-024c01724285)
+
 ## mutex를 어떻게 설계하였는가?
 - 이 카드분배기에서 딜러의 움직임을 따라하기 위해, DC모터와 서보모터의 동작을 동기화
 - 즉 서보모터가 회전하면서 DC모터의 회전을 동시에 하기 위해 쓰레드 활용
@@ -108,7 +110,7 @@ while (!servo_reached)
 servo_reached = 0;
 pthread_mutex_unlock(&mutex);
 ```
-### Demo영상
+### Demo영상(Youtube)
 ![image](https://github.com/user-attachments/assets/9269e44c-bf87-46bb-bcef-e6a763f2947d)
 
 
