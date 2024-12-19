@@ -12,13 +12,29 @@
 - opencv를 활용하여 사용자의 얼굴 인식. (opencv HaarCascade_Frontface 사용)
 - 해당좌표를 라즈베리파이로 전송 및 비율을 나누어서 서보로 값 전달
   
-## Survo Motor
+## Servo Motor
 - 카메라에서 전달받은 값을 통해 0~180도로 사용자의 위치로 전송 이후 DC모터
 - 한장씩 뿌리고 원위치 반복.
 
 ## DC Motor
 - 기기 하단에서 슬라이딩방식으로 카드 던져주기
 - 서보모터로부터 신호를 받아 카드 1장 발사
+
+## GPIO GPN NUMBER
+### DC Motor
+- VCC: 5V Power (2)
+- GND: GROUND (39)
+- INA: GPIO 18 (PWM0) (12)
+- INB: GPIO 19 (PWM1) (35)
+### SERVO Motor
+- VCC (빨간선): 3v3 Power (1)
+- GND (갈색선): GROUND(34)
+- CONTROL SIGNAL (주황선): GPIO 12 (PWM0) (32)
+### BLUETOOTH
+- VCC: 5v Power(4)
+- GND: GROUND (6)
+- TXD: GPIO 1 (EEPROM SCL) (28)
+- RXD: GPIO 0 (EEPROM SDA) (27)
 
 
 ## 설계도중 문제점 발생
@@ -66,11 +82,29 @@
  * 사용 기술
    1. 안드로이드 권한 요청(근처 기기)
    2. 페어링 된 블루투스 모듈과 연결
-   3. 연결된 모듈로 값 전달 
+   3. 연결된 모듈로 값 전달
+
+# 주요 개발 내용
+## 1. softPWM 사용
+- 사용자의 좌표에 정확히 카드를 보내기 위해 PWM 주파수를 Servo Motor를 중심으로 설정
+    - Servo Motor에 맞춘 주파수 DC Motor의 비정상적인 작동 유발
+        - 느린 회전 속도
+        - 종종 pwm 신호를 받지 못하여 회전하지 않음
+- softPWM을 사용함으로 DC Motor의 정상적으로 작동하도로 구현
+    - softPwmCreate
+    - softPwmWrite
+      
+## 2. 카메라 기능을 구현한 Python과의 코드 통합
+- Python을 활용하여 사용자의 수와 좌표를 인식
+  - 수집한 데이터를 .txt 파일에 저장
+- 메인 함수에서 저장된 .txt 파일을 읽음
+  - 사용자 수에 맞게 사용자의 위치 배열을 malloc()을 이용하여 동적 할당
+  - 사용자 위치 좌표를 카드 딜러기의 배치(-90도 ~ 90도)에 맞게 적절히 변환
+    - 좌표 변환을 .py 파일에서 처리 수 있지만, 하드웨어 테스트 시 좌표 변경이 잦기 때문에 메인 코드에서 처리하도록 설계 
 
 ## 문제점
 1) 정확히 한장을 뿌릴 수 있는가?
--> 한장이 나올때도 있고, 두장이 도 있음
+-> 한장이 나올때도 있고, 두장이 나올 때도 있음
 2) 카드가 겹쳐있다면 어떻게 대처할 것인가?
 -> 대응 불가능...
 
