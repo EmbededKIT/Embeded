@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/58148735-48e0-42a7-9560-5465a1d6cff6)#Embeded KIT Project(8조)
+Embeded KIT Project(8조)
 **#에 자신이 맡은 파트 그림 및 내용 보충**
 카드 분배기
 
