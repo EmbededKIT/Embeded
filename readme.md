@@ -1,13 +1,32 @@
-#Embeded KIT Project(8조)
+![image](https://github.com/user-attachments/assets/58148735-48e0-42a7-9560-5465a1d6cff6)#Embeded KIT Project(8조)
 **#에 자신이 맡은 파트 그림 및 내용 보충**
 카드 분배기
 
 # 초기설계(11/28~) 개발시작
 
+## 11/28 회의 내용 및 아이디어
+1. 앱과 라즈베리파이를 이용한 전자피아노
+2. 스마트팜
+3. 앱으로 조종하는 4륜 자동차
+4. 카드분배기
+
+최종 - 카드 분배기 선택
+
+![image](https://github.com/user-attachments/assets/c2aa950d-0bdb-463d-b120-7cbc635fa9d9)
+
+
+1. 서보모터와 DC모터를 사용해서 카드분배기를 만들어보자.
+2. DC모터는 카드를 내보낼때 사용하고 서보모터는 카드를 뿌려줄 위치로 옮기면 되지 않을까?
+3. 모터만 사용하면 심심하니 여기에 OpenCV를 이용하여 객체 탐지를 도입해보자.
+4. 이를 통해 얼굴인식을 하고 해당 좌표로 쏴주는 역할은 어떤가?
+5. 3D프린터를 통해 슬라이딩을 하면 카드가 한개 나올 수 있을만한 덱과 회전몸통을 만들어보겠다.
+
+프로토타입
 ## Bluetooth 
 - 앱을 활용하여 사용자 Input값 받고 전송
 - 사용자 수와 카드 수 전달 
 - APP UI
+
 ## Camera
 - opencv를 활용하여 사용자의 얼굴 인식. (opencv HaarCascade_Frontface 사용)
 - 해당좌표를 라즈베리파이로 전송 및 비율을 나누어서 서보로 값 전달
@@ -26,10 +45,12 @@
 - GND: GROUND (39)
 - INA: GPIO 18 (PWM0) (12)
 - INB: GPIO 19 (PWM1) (35)
+ 
 ### SERVO Motor
 - VCC (빨간선): 3v3 Power (1)
 - GND (갈색선): GROUND(34)
 - CONTROL SIGNAL (주황선): GPIO 12 (PWM0) (32)
+  
 ### BLUETOOTH
 - VCC: 5v Power(4)
 - GND: GROUND (6)
