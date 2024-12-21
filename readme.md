@@ -122,8 +122,11 @@ Dectection을 통해 인원수값을 받아오고, 엡에서는 카드수만 받
 
 # 최종(12/15)
 1. 완성본
+   
 ![image](https://github.com/user-attachments/assets/10a6c95a-74f5-4bf8-860c-992cab3a0379)
+
 2. 카메라
+   
 ![image](https://github.com/user-attachments/assets/3f4b5313-11b8-4072-b476-f0c5ec201fc4)
 
 ## 구조도
